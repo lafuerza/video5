@@ -65,7 +65,16 @@ class TMDBService {
 
   // Anime (using discover with Japanese origin)
   async getPopularAnime(page: number = 1): Promise<APIResponse<TVShow>> {
-    return this.fetchData(`/discover/tv?with_origin_country=JP&with_genres=16&language=es-ES&page=${page}&sort_by=popularity.desc`);
+    return this.fetchData(`/discover/tv?with_origin_country=JP&with_genres=16&language=es-ES&page=${page}&sort_by=popularity.desc&include_adult=false`);
+  }
+
+  async getTopRatedAnime(page: number = 1): Promise<APIResponse<TVShow>> {
+    return this.fetchData(`/discover/tv?with_origin_country=JP&with_genres=16&language=es-ES&page=${page}&sort_by=vote_average.desc&vote_count.gte=100&include_adult=false`);
+  }
+
+  async searchAnime(query: string, page: number = 1): Promise<APIResponse<TVShow>> {
+    const encodedQuery = encodeURIComponent(query);
+    return this.fetchData(`/search/tv?query=${encodedQuery}&language=es-ES&page=${page}&with_genres=16&with_origin_country=JP`);
   }
 
   // Genres

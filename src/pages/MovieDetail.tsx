@@ -160,8 +160,8 @@ export function MovieDetail() {
             {/* Overview */}
             <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100 p-8 mb-8 transform hover:scale-[1.02] transition-all duration-300">
               <div className="flex items-center mb-6">
-                <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-3 rounded-xl mr-4">
-                  <span className="text-2xl">📖</span>
+                <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-3 rounded-xl mr-4 shadow-lg">
+                  <span className="text-2xl">📚</span>
                 </div>
                 <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   Sinopsis
@@ -276,8 +276,8 @@ export function MovieDetail() {
               <div className="space-y-6">
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-blue-200 transition-colors">
                   <div className="flex items-center mb-2">
-                    <div className="bg-blue-100 p-2 rounded-lg mr-3">
-                      <span className="text-sm">📊</span>
+                    <div className="bg-blue-100 p-2 rounded-lg mr-3 shadow-sm">
+                      <span className="text-sm">🎯</span>
                     </div>
                     <h3 className="font-semibold text-gray-900">Estado</h3>
                   </div>
@@ -286,8 +286,8 @@ export function MovieDetail() {
                 
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-purple-200 transition-colors">
                   <div className="flex items-center mb-2">
-                    <div className="bg-purple-100 p-2 rounded-lg mr-3">
-                      <span className="text-sm">🌍</span>
+                    <div className="bg-purple-100 p-2 rounded-lg mr-3 shadow-sm">
+                      <span className="text-sm">🌐</span>
                     </div>
                     <h3 className="font-semibold text-gray-900">Idioma Original</h3>
                   </div>
@@ -296,8 +296,8 @@ export function MovieDetail() {
                 
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-green-200 transition-colors">
                   <div className="flex items-center mb-2">
-                    <div className="bg-green-100 p-2 rounded-lg mr-3">
-                      <span className="text-sm">💰</span>
+                    <div className="bg-green-100 p-2 rounded-lg mr-3 shadow-sm">
+                      <span className="text-sm">💵</span>
                     </div>
                     <h3 className="font-semibold text-gray-900">Presupuesto</h3>
                   </div>
@@ -311,8 +311,8 @@ export function MovieDetail() {
                 
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-yellow-200 transition-colors">
                   <div className="flex items-center mb-2">
-                    <div className="bg-yellow-100 p-2 rounded-lg mr-3">
-                      <span className="text-sm">💵</span>
+                    <div className="bg-yellow-100 p-2 rounded-lg mr-3 shadow-sm">
+                      <span className="text-sm">💰</span>
                     </div>
                     <h3 className="font-semibold text-gray-900">Recaudación</h3>
                   </div>
@@ -327,8 +327,8 @@ export function MovieDetail() {
                 {movie.production_companies.length > 0 && (
                   <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-indigo-200 transition-colors">
                     <div className="flex items-center mb-3">
-                      <div className="bg-indigo-100 p-2 rounded-lg mr-3">
-                        <span className="text-sm">🏢</span>
+                      <div className="bg-indigo-100 p-2 rounded-lg mr-3 shadow-sm">
+                        <span className="text-sm">🏭</span>
                       </div>
                       <h3 className="font-semibold text-gray-900">Productoras</h3>
                     </div>
