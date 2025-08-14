@@ -2,22 +2,25 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Trash2, Star, Calendar, MessageCircle, ArrowLeft, Edit3, Tv } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { PriceCard } from '../components/PriceCard';
 import { sendToWhatsApp } from '../utils/whatsapp';
 import { IMAGE_BASE_URL, POSTER_SIZE } from '../config/api';
 
 export function Cart() {
-  const { state, removeItem, clearCart } = useCart();
+  const { state, removeItem, clearCart, calculateItemPrice, calculateTotalPrice } = useCart();
 
   const handleWhatsAppSend = () => {
     if (state.items.length > 0) {
-      // Formatear items para WhatsApp incluyendo temporadas seleccionadas
+      // Formatear items para WhatsApp incluyendo temporadas seleccionadas y precios
       const formattedItems = state.items.map(item => ({
         ...item,
         title: item.type === 'tv' && item.selectedSeasons && item.selectedSeasons.length > 0
           ? `${item.title} (Temporadas: ${item.selectedSeasons.sort((a, b) => a - b).join(', ')})`
-          : item.title
+          : item.title,
+        price: calculateItemPrice(item)
       }));
-      sendToWhatsApp(formattedItems);
+      const totalPrice = calculateTotalPrice();
+      sendToWhatsApp(formattedItems, totalPrice);
     }
   };
 
@@ -35,6 +38,17 @@ export function Cart() {
       ? `${IMAGE_BASE_URL}/${POSTER_SIZE}${posterPath}`
       : 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=500&h=750&fit=crop&crop=center';
   };
+
+  const isAnime = (item: any) => {
+    return item.original_language === 'ja' || 
+           (item.genre_ids && item.genre_ids.includes(16)) ||
+           item.title?.toLowerCase().includes('anime');
+  };
+
+  const totalPrice = calculateTotalPrice();
+  const movieCount = state.items.filter(item => item.type === 'movie').length;
+  const seriesCount = state.items.filter(item => item.type === 'tv').length;
+  const animeCount = state.items.filter(item => isAnime(item)).length;
 
   if (state.items.length === 0) {
     return (
@@ -107,7 +121,7 @@ export function Cart() {
           <div className="divide-y divide-gray-200">
             {state.items.map((item) => (
               <div key={`${item.type}-${item.id}`} className="p-6 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center space-x-4">
+                <div className="flex items-start space-x-4">
                   {/* Poster */}
                   <Link to={getItemUrl(item)} className="flex-shrink-0">
                     <img
@@ -155,6 +169,15 @@ export function Cart() {
                   </div>
 
                   {/* Action Buttons */}
+                  <div className="flex-shrink-0 mb-4">
+                    <PriceCard 
+                      type={item.type}
+                      selectedSeasons={item.selectedSeasons}
+                      isAnime={isAnime(item)}
+                    />
+                  </div>
+
+                  {/* Action Buttons */}
                   <div className="flex-shrink-0 flex items-center space-x-2">
                     {item.type === 'tv' && (
                       <Link
@@ -190,20 +213,62 @@ export function Cart() {
                 Resumen del Pedido
               </h3>
               <div className="text-right">
-                <div className="text-3xl font-bold">{state.total}</div>
+                <div className="text-3xl font-bold">${totalPrice.toLocaleString()} CUP</div>
                 <div className="text-sm opacity-90">elementos</div>
               </div>
             </div>
           </div>
           
           <div className="p-6">
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            {/* Desglose detallado de precios */}
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 mb-6 border border-blue-100">
+              <h4 className="font-bold text-gray-900 mb-4 flex items-center">
+                <span className="text-lg mr-2">💰</span>
+                Desglose de Precios
+              </h4>
+              <div className="space-y-3">
+                {state.items.map((item) => {
+                  const itemPrice = calculateItemPrice(item);
+                  return (
+                    <div key={`${item.type}-${item.id}`} className="flex justify-between items-center bg-white rounded-lg p-3 border border-gray-200">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 text-sm">{item.title}</p>
+                        <p className="text-xs text-gray-600">
+                          {item.type === 'movie' ? 'Película' : 'Serie'}
+                          {item.selectedSeasons && item.selectedSeasons.length > 0 && 
+                            ` • ${item.selectedSeasons.length} temporada${item.selectedSeasons.length > 1 ? 's' : ''}`
+                          }
+                          {isAnime(item) && ' • Anime'}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-green-600">${itemPrice.toLocaleString()} CUP</p>
+                        {item.type === 'tv' && item.selectedSeasons && item.selectedSeasons.length > 0 && (
+                          <p className="text-xs text-gray-500">
+                            ${(itemPrice / item.selectedSeasons.length).toLocaleString()} CUP/temp.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-bold text-gray-900">Total:</span>
+                  <span className="text-2xl font-bold text-green-600">${totalPrice.toLocaleString()} CUP</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-blue-600 mb-1">Películas</p>
                     <p className="text-2xl font-bold text-blue-800">
-                      {state.items.filter(item => item.type === 'movie').length}
+                      {movieCount}
                     </p>
                   </div>
                   <div className="bg-blue-100 p-3 rounded-lg">
@@ -217,11 +282,23 @@ export function Cart() {
                   <div>
                     <p className="text-sm font-medium text-purple-600 mb-1">Series/Anime</p>
                     <p className="text-2xl font-bold text-purple-800">
-                      {state.items.filter(item => item.type === 'tv').length}
+                      {seriesCount}
                     </p>
                   </div>
                   <div className="bg-purple-100 p-3 rounded-lg">
                     <span className="text-2xl">📺</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-pink-50 rounded-xl p-4 border border-pink-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-pink-600 mb-1">Anime</p>
+                    <p className="text-2xl font-bold text-pink-800">{animeCount}</p>
+                  </div>
+                  <div className="bg-pink-100 p-3 rounded-lg">
+                    <span className="text-2xl">🎌</span>
                   </div>
                 </div>
               </div>
@@ -270,11 +347,11 @@ export function Cart() {
             <div className="mt-4 p-4 bg-green-50 rounded-xl border border-green-100">
               <p className="text-sm text-green-700 text-center flex items-center justify-center">
                 <span className="mr-2">📱</span>
-                Tu pedido será enviado al número +53 5469 0878
+                Tu pedido (${totalPrice.toLocaleString()} CUP) será enviado al número +53 5469 0878
               </p>
               {state.items.some(item => item.type === 'tv' && item.selectedSeasons) && (
                 <p className="text-xs text-green-600 text-center mt-2">
-                  * Las temporadas seleccionadas se incluirán en el mensaje
+                  * Las temporadas seleccionadas y precios se incluirán en el mensaje
                 </p>
               )}
             </div>
