@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import { Toast } from '../components/Toast';
 import type { CartItem } from '../types/movie';
 
 interface SeriesCartItem extends CartItem {
@@ -25,6 +26,8 @@ interface CartContextType {
   clearCart: () => void;
   isInCart: (id: number) => boolean;
   getItemSeasons: (id: number) => number[];
+  calculateItemPrice: (item: SeriesCartItem) => number;
+  calculateTotalPrice: () => number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -72,6 +75,11 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, { items: [], total: 0 });
+  const [toast, setToast] = React.useState<{
+    message: string;
+    type: 'success' | 'error';
+    isVisible: boolean;
+  }>({ message: '', type: 'success', isVisible: false });
 
   useEffect(() => {
     const savedCart = localStorage.getItem('movieCart');
@@ -90,14 +98,40 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [state.items]);
 
   const addItem = (item: SeriesCartItem) => {
+    const price = calculateItemPrice(item);
+    const itemWithPrice = { ...item, price, totalPrice: price };
     dispatch({ type: 'ADD_ITEM', payload: item });
+    
+    // Mostrar notificación
+    setToast({
+      message: `"${item.title}" agregado al carrito`,
+      type: 'success',
+      isVisible: true
+    });
   };
 
   const removeItem = (id: number) => {
+    const item = state.items.find(item => item.id === id);
     dispatch({ type: 'REMOVE_ITEM', payload: id });
+    
+    // Mostrar notificación
+    if (item) {
+      setToast({
+        message: `"${item.title}" retirado del carrito`,
+        type: 'error',
+        isVisible: true
+      });
+    }
   };
 
   const updateSeasons = (id: number, seasons: number[]) => {
+    const item = state.items.find(item => item.id === id);
+    if (item) {
+      const updatedItem = { ...item, selectedSeasons: seasons };
+      const newPrice = calculateItemPrice(updatedItem);
+      updatedItem.price = newPrice;
+      updatedItem.totalPrice = newPrice;
+    }
     dispatch({ type: 'UPDATE_SEASONS', payload: { id, seasons } });
   };
 
@@ -114,9 +148,48 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return item?.selectedSeasons || [];
   };
 
+  const calculateItemPrice = (item: SeriesCartItem): number => {
+    const isAnime = item.original_language === 'ja' || 
+                   (item.genre_ids && item.genre_ids.includes(16)) ||
+                   item.title?.toLowerCase().includes('anime');
+    
+    if (item.type === 'movie') {
+      return isAnime ? 80 : 80; // Películas y animados: $80 CUP
+    } else {
+      // Series: $300 CUP por temporada
+      const seasons = item.selectedSeasons?.length || 1;
+      return seasons * 300;
+    }
+  };
+
+  const calculateTotalPrice = (): number => {
+    return state.items.reduce((total, item) => {
+      return total + calculateItemPrice(item);
+    }, 0);
+  };
+
+  const closeToast = () => {
+    setToast(prev => ({ ...prev, isVisible: false }));
+  };
   return (
-    <CartContext.Provider value={{ state, addItem, removeItem, updateSeasons, clearCart, isInCart, getItemSeasons }}>
+    <CartContext.Provider value={{ 
+      state, 
+      addItem, 
+      removeItem, 
+      updateSeasons, 
+      clearCart, 
+      isInCart, 
+      getItemSeasons,
+      calculateItemPrice,
+      calculateTotalPrice
+    }}>
       {children}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={closeToast}
+      />
     </CartContext.Provider>
   );
 }

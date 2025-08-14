@@ -110,6 +110,8 @@ export interface CartItem {
   first_air_date?: string;
   vote_average: number;
   selectedSeasons?: number[];
+  price?: number;
+  totalPrice?: number;
 }
 
 export interface APIResponse<T> {

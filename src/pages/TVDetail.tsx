@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Star, Calendar, Tv, Plus, Check, Play, ChevronDown } from 'lucide-react';
 import { tmdbService } from '../services/tmdb';
 import { VideoPlayer } from '../components/VideoPlayer';
+import { PriceCard } from '../components/PriceCard';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { useCart } from '../context/CartContext';
@@ -24,6 +25,10 @@ export function TVDetail() {
   const tvId = parseInt(id || '0');
   const inCart = isInCart(tvId);
 
+  // Detectar si es anime
+  const isAnime = tvShow?.original_language === 'ja' || 
+                 (tvShow?.genres && tvShow.genres.some(g => g.name.toLowerCase().includes('animat'))) ||
+                 tvShow?.name?.toLowerCase().includes('anime');
   // Cargar temporadas seleccionadas si ya está en el carrito
   useEffect(() => {
     if (inCart) {
@@ -378,8 +383,8 @@ export function TVDetail() {
               >
                 {inCart ? (
                   <>
-                    <Check className="mr-2 h-5 w-5" />
-                    Agregada al Carrito
+                    <X className="mr-2 h-5 w-5" />
+                    Retirar del Carrito
                   </>
                 ) : (
                   <>
@@ -389,11 +394,19 @@ export function TVDetail() {
                 )}
               </button>
 
+              {/* Price Card */}
+              <div className="mb-6">
+                <PriceCard 
+                  type="tv" 
+                  selectedSeasons={selectedSeasons}
+                  isAnime={isAnime}
+                />
+              </div>
               <div className="space-y-6">
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-purple-200 transition-colors">
                   <div className="flex items-center mb-2">
-                    <div className="bg-purple-100 p-2 rounded-lg mr-3 shadow-sm">
-                      <span className="text-sm">🎯</span>
+                    <div className="bg-purple-100 p-2 rounded-lg mr-3 shadow-sm animate-pulse">
+                      <span className="text-sm">📺</span>
                     </div>
                     <h3 className="font-semibold text-gray-900">Estado</h3>
                   </div>
@@ -402,7 +415,7 @@ export function TVDetail() {
                 
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-blue-200 transition-colors">
                   <div className="flex items-center mb-2">
-                    <div className="bg-blue-100 p-2 rounded-lg mr-3 shadow-sm">
+                    <div className="bg-blue-100 p-2 rounded-lg mr-3 shadow-sm animate-bounce">
                       <span className="text-sm">🚀</span>
                     </div>
                     <h3 className="font-semibold text-gray-900">Primera Emisión</h3>
@@ -414,7 +427,7 @@ export function TVDetail() {
                 
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-green-200 transition-colors">
                   <div className="flex items-center mb-2">
-                    <div className="bg-green-100 p-2 rounded-lg mr-3 shadow-sm">
+                    <div className="bg-green-100 p-2 rounded-lg mr-3 shadow-sm animate-pulse">
                       <span className="text-sm">🎬</span>
                     </div>
                     <h3 className="font-semibold text-gray-900">Temporadas</h3>
@@ -424,7 +437,7 @@ export function TVDetail() {
                 
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-yellow-200 transition-colors">
                   <div className="flex items-center mb-2">
-                    <div className="bg-yellow-100 p-2 rounded-lg mr-3 shadow-sm">
+                    <div className="bg-yellow-100 p-2 rounded-lg mr-3 shadow-sm animate-bounce">
                       <span className="text-sm">🎞️</span>
                     </div>
                     <h3 className="font-semibold text-gray-900">Episodios</h3>
@@ -434,7 +447,7 @@ export function TVDetail() {
                 
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-indigo-200 transition-colors">
                   <div className="flex items-center mb-2">
-                    <div className="bg-indigo-100 p-2 rounded-lg mr-3 shadow-sm">
+                    <div className="bg-indigo-100 p-2 rounded-lg mr-3 shadow-sm animate-pulse">
                       <span className="text-sm">⏰</span>
                     </div>
                     <h3 className="font-semibold text-gray-900">Duración</h3>
@@ -449,7 +462,7 @@ export function TVDetail() {
 
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-pink-200 transition-colors">
                   <div className="flex items-center mb-2">
-                    <div className="bg-pink-100 p-2 rounded-lg mr-3 shadow-sm">
+                    <div className="bg-pink-100 p-2 rounded-lg mr-3 shadow-sm animate-bounce">
                       <span className="text-sm">🌐</span>
                     </div>
                     <h3 className="font-semibold text-gray-900">Idioma Original</h3>
@@ -460,7 +473,7 @@ export function TVDetail() {
                 {tvShow.production_companies.length > 0 && (
                   <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-orange-200 transition-colors">
                     <div className="flex items-center mb-3">
-                      <div className="bg-orange-100 p-2 rounded-lg mr-3 shadow-sm">
+                      <div className="bg-orange-100 p-2 rounded-lg mr-3 shadow-sm animate-pulse">
                         <span className="text-sm">🏭</span>
                       </div>
                       <h3 className="font-semibold text-gray-900">Productoras</h3>

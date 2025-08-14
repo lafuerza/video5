@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Star, Calendar, Clock, Plus, Check, Play } from 'lucide-react';
 import { tmdbService } from '../services/tmdb';
 import { VideoPlayer } from '../components/VideoPlayer';
+import { PriceCard } from '../components/PriceCard';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { useCart } from '../context/CartContext';
@@ -22,6 +23,9 @@ export function MovieDetail() {
   const movieId = parseInt(id || '0');
   const inCart = isInCart(movieId);
 
+  // Detectar si es anime
+  const isAnime = movie?.original_language === 'ja' || 
+                 (movie?.genres && movie.genres.some(g => g.name.toLowerCase().includes('animat')));
   useEffect(() => {
     const fetchMovieData = async () => {
       try {
@@ -262,8 +266,8 @@ export function MovieDetail() {
               >
                 {inCart ? (
                   <>
-                    <Check className="mr-2 h-5 w-5" />
-                    Agregada al Carrito
+                    <X className="mr-2 h-5 w-5" />
+                    Retirar del Carrito
                   </>
                 ) : (
                   <>
@@ -273,11 +277,18 @@ export function MovieDetail() {
                 )}
               </button>
 
+              {/* Price Card */}
+              <div className="mb-6">
+                <PriceCard 
+                  type="movie" 
+                  isAnime={isAnime}
+                />
+              </div>
               <div className="space-y-6">
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-blue-200 transition-colors">
                   <div className="flex items-center mb-2">
-                    <div className="bg-blue-100 p-2 rounded-lg mr-3 shadow-sm">
-                      <span className="text-sm">🎯</span>
+                    <div className="bg-blue-100 p-2 rounded-lg mr-3 shadow-sm animate-pulse">
+                      <span className="text-sm">🎬</span>
                     </div>
                     <h3 className="font-semibold text-gray-900">Estado</h3>
                   </div>
@@ -286,7 +297,7 @@ export function MovieDetail() {
                 
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-purple-200 transition-colors">
                   <div className="flex items-center mb-2">
-                    <div className="bg-purple-100 p-2 rounded-lg mr-3 shadow-sm">
+                    <div className="bg-purple-100 p-2 rounded-lg mr-3 shadow-sm animate-bounce">
                       <span className="text-sm">🌐</span>
                     </div>
                     <h3 className="font-semibold text-gray-900">Idioma Original</h3>
@@ -296,7 +307,7 @@ export function MovieDetail() {
                 
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-green-200 transition-colors">
                   <div className="flex items-center mb-2">
-                    <div className="bg-green-100 p-2 rounded-lg mr-3 shadow-sm">
+                    <div className="bg-green-100 p-2 rounded-lg mr-3 shadow-sm animate-pulse">
                       <span className="text-sm">💵</span>
                     </div>
                     <h3 className="font-semibold text-gray-900">Presupuesto</h3>
@@ -311,7 +322,7 @@ export function MovieDetail() {
                 
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-yellow-200 transition-colors">
                   <div className="flex items-center mb-2">
-                    <div className="bg-yellow-100 p-2 rounded-lg mr-3 shadow-sm">
+                    <div className="bg-yellow-100 p-2 rounded-lg mr-3 shadow-sm animate-bounce">
                       <span className="text-sm">💰</span>
                     </div>
                     <h3 className="font-semibold text-gray-900">Recaudación</h3>
@@ -327,7 +338,7 @@ export function MovieDetail() {
                 {movie.production_companies.length > 0 && (
                   <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-indigo-200 transition-colors">
                     <div className="flex items-center mb-3">
-                      <div className="bg-indigo-100 p-2 rounded-lg mr-3 shadow-sm">
+                      <div className="bg-indigo-100 p-2 rounded-lg mr-3 shadow-sm animate-pulse">
                         <span className="text-sm">🏭</span>
                       </div>
                       <h3 className="font-semibold text-gray-900">Productoras</h3>
