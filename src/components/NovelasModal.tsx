@@ -303,9 +303,7 @@ export function NovelasModal({ isOpen, onClose }: NovelasModalProps) {
   if (!isOpen) return null;
 
   return (
-    listText += "💰 Precio base: $5 CUP por capítulo\n";
-    listText += "💳 Transferencia bancaria: +10% de recargo\n";
-    listText += "💵 Efectivo: Sin recargo adicional\n";
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl w-full max-w-6xl max-h-[95vh] overflow-hidden shadow-2xl animate-in fade-in duration-300">
         {/* Header */}
         <div className="bg-gradient-to-r from-pink-600 to-purple-600 p-4 sm:p-6 text-white">
