@@ -150,15 +150,58 @@ export function NovelasModal({ isOpen, onClose }: NovelasModalProps) {
     listText += "📱 Contacto: +5354690878\n\n";
     listText += "═══════════════════════════════════\n\n";
     
+    // Separar novelas por tipo de pago para mostrar cálculos
+    listText += "💵 PRECIOS EN EFECTIVO:\n";
+    listText += "═══════════════════════════════════\n\n";
+    
     novelas.forEach((novela, index) => {
+      const baseCost = novela.capitulos * 5;
       listText += `${index + 1}. ${novela.titulo}\n`;
       listText += `   📺 Género: ${novela.genero}\n`;
       listText += `   📊 Capítulos: ${novela.capitulos}\n`;
       listText += `   📅 Año: ${novela.año}\n`;
-      listText += `   💰 Costo total: $${(novela.capitulos * 5).toLocaleString()} CUP\n\n`;
+      listText += `   💰 Costo en efectivo: $${baseCost.toLocaleString()} CUP\n\n`;
     });
     
+    listText += "\n🏦 PRECIOS CON TRANSFERENCIA BANCARIA (+10%):\n";
+    listText += "═══════════════════════════════════\n\n";
+    
+    novelas.forEach((novela, index) => {
+      const baseCost = novela.capitulos * 5;
+      const transferCost = Math.round(baseCost * 1.1);
+      const recargo = transferCost - baseCost;
+      listText += `${index + 1}. ${novela.titulo}\n`;
+      listText += `   📺 Género: ${novela.genero}\n`;
+      listText += `   📊 Capítulos: ${novela.capitulos}\n`;
+      listText += `   📅 Año: ${novela.año}\n`;
+      listText += `   💰 Costo base: $${baseCost.toLocaleString()} CUP\n`;
+      listText += `   💳 Recargo (10%): +$${recargo.toLocaleString()} CUP\n`;
+      listText += `   💰 Costo con transferencia: $${transferCost.toLocaleString()} CUP\n\n`;
+    });
+    
+    listText += "\n📊 RESUMEN DE COSTOS:\n";
+    listText += "═══════════════════════════════════\n\n";
+    
+    const totalCapitulos = novelas.reduce((sum, novela) => sum + novela.capitulos, 0);
+    const totalEfectivo = novelas.reduce((sum, novela) => sum + (novela.capitulos * 5), 0);
+    const totalTransferencia = novelas.reduce((sum, novela) => sum + Math.round((novela.capitulos * 5) * 1.1), 0);
+    const totalRecargo = totalTransferencia - totalEfectivo;
+    
+    listText += `📊 Total de novelas: ${novelas.length}\n`;
+    listText += `📊 Total de capítulos: ${totalCapitulos.toLocaleString()}\n\n`;
+    listText += `💵 CATÁLOGO COMPLETO EN EFECTIVO:\n`;
+    listText += `   💰 Costo total: $${totalEfectivo.toLocaleString()} CUP\n\n`;
+    listText += `🏦 CATÁLOGO COMPLETO CON TRANSFERENCIA:\n`;
+    listText += `   💰 Costo base: $${totalEfectivo.toLocaleString()} CUP\n`;
+    listText += `   💳 Recargo total (10%): +$${totalRecargo.toLocaleString()} CUP\n`;
+    listText += `   💰 Costo total con transferencia: $${totalTransferencia.toLocaleString()} CUP\n\n`;
+    
     listText += "═══════════════════════════════════\n";
+    listText += "💡 INFORMACIÓN IMPORTANTE:\n";
+    listText += "• Los precios en efectivo no tienen recargo adicional\n";
+    listText += "• Las transferencias bancarias tienen un 10% de recargo\n";
+    listText += "• Puedes seleccionar novelas individuales o el catálogo completo\n";
+    listText += "• Todos los precios están en pesos cubanos (CUP)\n\n";
     listText += "📞 Para encargar, contacta al +5354690878\n";
     listText += "🌟 ¡Disfruta de las mejores novelas!\n";
     listText += `\n📅 Generado el: ${new Date().toLocaleString('es-ES')}`;
@@ -251,7 +294,7 @@ export function NovelasModal({ isOpen, onClose }: NovelasModalProps) {
   };
 
   const handleWhatsApp = () => {
-    const message = "Estoy interesado en el catálogo de novelas\nQuiero encargar la siguiente novela:\n\n";
+    const message = "Gracias por escribir a [TV a la Carta], se ha comunicado con el operador [Yero], Gracias por dedicarnos un momento de su tiempo hoy. ¿En qué puedo serle útil?";
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/5354690878?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
@@ -260,7 +303,9 @@ export function NovelasModal({ isOpen, onClose }: NovelasModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
+    listText += "💰 Precio base: $5 CUP por capítulo\n";
+    listText += "💳 Transferencia bancaria: +10% de recargo\n";
+    listText += "💵 Efectivo: Sin recargo adicional\n";
       <div className="bg-white rounded-2xl w-full max-w-6xl max-h-[95vh] overflow-hidden shadow-2xl animate-in fade-in duration-300">
         {/* Header */}
         <div className="bg-gradient-to-r from-pink-600 to-purple-600 p-4 sm:p-6 text-white">
