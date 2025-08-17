@@ -385,6 +385,17 @@ const AdminContext = createContext<{
   dispatch: React.Dispatch<AdminAction>;
   login: (username: string, password: string) => boolean;
   logout: () => void;
+  addNovela: (novela: Omit<NovelasConfig, 'id'>) => void;
+  updateNovela: (id: number, novela: Partial<NovelasConfig>) => void;
+  deleteNovela: (id: number) => void;
+  addDeliveryZone: (zone: Omit<DeliveryZoneConfig, 'id'>) => void;
+  updateDeliveryZone: (id: number, zone: Partial<DeliveryZoneConfig>) => void;
+  deleteDeliveryZone: (id: number) => void;
+  exportConfig: () => string;
+  importConfig: (configData: string) => boolean;
+  resetToDefaults: () => void;
+  showNotification: (message: string, type: 'success' | 'info' | 'warning' | 'error') => void;
+  exportSystemFiles: () => void;
 } | undefined>(undefined);
 
 export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -417,12 +428,100 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     dispatch({ type: 'LOG_OUT' });
   };
 
+  const addNovela = (novela: Omit<NovelasConfig, 'id'>) => {
+    const newNovela = {
+      ...novela,
+      id: Math.max(...state.config.novelas.map(n => n.id), 0) + 1
+    };
+    dispatch({ type: 'ADD_NOVELA', payload: newNovela });
+  };
+
+  const updateNovela = (id: number, novelaData: Partial<NovelasConfig>) => {
+    const existingNovela = state.config.novelas.find(n => n.id === id);
+    if (existingNovela) {
+      const updatedNovela = { ...existingNovela, ...novelaData };
+      dispatch({ type: 'UPDATE_NOVELA', payload: updatedNovela });
+    }
+  };
+
+  const deleteNovela = (id: number) => {
+    dispatch({ type: 'DELETE_NOVELA', payload: id });
+  };
+
+  const addDeliveryZone = (zone: Omit<DeliveryZoneConfig, 'id'>) => {
+    const newZone = {
+      ...zone,
+      id: Math.max(...state.config.deliveryZones.map(z => z.id), 0) + 1
+    };
+    dispatch({ type: 'ADD_DELIVERY_ZONE', payload: newZone });
+  };
+
+  const updateDeliveryZone = (id: number, zoneData: Partial<DeliveryZoneConfig>) => {
+    const existingZone = state.config.deliveryZones.find(z => z.id === id);
+    if (existingZone) {
+      const updatedZone = { ...existingZone, ...zoneData };
+      dispatch({ type: 'UPDATE_DELIVERY_ZONE', payload: updatedZone });
+    }
+  };
+
+  const deleteDeliveryZone = (id: number) => {
+    dispatch({ type: 'DELETE_DELIVERY_ZONE', payload: id });
+  };
+
+  const exportConfig = (): string => {
+    return JSON.stringify(state.config, null, 2);
+  };
+
+  const importConfig = (configData: string): boolean => {
+    try {
+      const parsedConfig = JSON.parse(configData);
+      // Basic validation
+      if (parsedConfig.pricing && parsedConfig.novelas && parsedConfig.deliveryZones) {
+        dispatch({ type: 'LOAD_CONFIG', payload: parsedConfig });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const resetToDefaults = () => {
+    dispatch({ type: 'LOAD_CONFIG', payload: defaultConfig });
+  };
+
+  const showNotification = (message: string, type: 'success' | 'info' | 'warning' | 'error') => {
+    // This is a placeholder - notifications are handled locally in AdminPanel
+    console.log(`${type.toUpperCase()}: ${message}`);
+  };
+
+  const exportSystemFiles = () => {
+    // This is a placeholder for system file export functionality
+    console.log('Export system files functionality');
+  };
+
   useEffect(() => {
     localStorage.setItem('adminConfig', JSON.stringify(state.config));
   }, [state.config]);
 
   return (
-    <AdminContext.Provider value={{ state, dispatch, login, logout }}>
+    <AdminContext.Provider value={{ 
+      state, 
+      dispatch, 
+      login, 
+      logout,
+      addNovela,
+      updateNovela,
+      deleteNovela,
+      addDeliveryZone,
+      updateDeliveryZone,
+      deleteDeliveryZone,
+      exportConfig,
+      importConfig,
+      resetToDefaults,
+      showNotification,
+      exportSystemFiles
+    }}>
       {children}
     </AdminContext.Provider>
   );
