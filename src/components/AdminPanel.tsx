@@ -9,7 +9,7 @@ interface AdminPanelProps {
 }
 
 export function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
-  const { state, logout, updatePricing, addNovela, updateNovela, deleteNovela, addDeliveryZone, updateDeliveryZone, deleteDeliveryZone, exportConfig, importConfig, resetToDefaults, showNotification, exportSystemFiles } = useAdmin();
+  const { state, logout, dispatch, addNovela, updateNovela, deleteNovela, addDeliveryZone, updateDeliveryZone, deleteDeliveryZone, exportConfig, importConfig, resetToDefaults, showNotification, exportSystemFiles } = useAdmin();
   const [activeTab, setActiveTab] = useState<'pricing' | 'novelas' | 'delivery' | 'backup'>('pricing');
   const [showPassword, setShowPassword] = useState(false);
   const [notifications, setNotifications] = useState<Array<{ id: number; message: string; type: 'success' | 'info' | 'warning' | 'error' }>>([]);
@@ -59,7 +59,7 @@ export function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
 
   const handlePricingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updatePricing(pricingForm);
+    dispatch({ type: 'UPDATE_PRICING', payload: pricingForm });
     displayLocalNotification('Configuración de precios actualizada correctamente', 'success');
   };
 
